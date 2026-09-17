@@ -180,7 +180,7 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
   }
 
   var S = null;
-  var DEMO = {"user": {"id": "demo", "name": "Зебо"}, "settings": {"balance_threshold": 0.9, "default_timer_min": 40, "extend_min": 10}, "balance_streak": 6, "spheres": [{"id": "body", "name": "Тело", "icon": "🧘‍♀️", "color": "#F4A05A"}, {"id": "beauty", "name": "Красота", "icon": "🌸", "color": "#E98C8C"}, {"id": "soul", "name": "Душа", "icon": "🕊️", "color": "#B39AD1"}, {"id": "family", "name": "Семья", "icon": "🤍", "color": "#E9B949"}, {"id": "work", "name": "Работа", "icon": "💼", "color": "#86AE8C"}, {"id": "growth", "name": "Развитие", "icon": "📖", "color": "#7EA6C8"}], "habits": [{"id": "juice", "block": "morning", "sphere": "body", "title": "Утренний сок", "streak": 14, "done": true}, {"id": "med_morning", "block": "morning", "sphere": "soul", "title": "Утренняя медитация", "streak": 9, "done": true}, {"id": "mfr_morning", "block": "morning", "sphere": "body", "title": "МФР / йога", "streak": 5, "done": true}, {"id": "ff_morning", "block": "morning", "sphere": "beauty", "title": "Фейс-фитнес", "streak": 3, "done": false}, {"id": "strength", "block": "day", "sphere": "body", "title": "Силовая тренировка", "streak": 2, "done": false}, {"id": "salad", "block": "evening", "sphere": "body", "title": "Вечерний салат", "streak": 11, "done": false}, {"id": "mfr_evening", "block": "evening", "sphere": "body", "title": "МФР / йога", "streak": 4, "done": false}, {"id": "ff_evening", "block": "evening", "sphere": "beauty", "title": "Фейс-фитнес", "streak": 3, "done": false}, {"id": "med_evening", "block": "evening", "sphere": "soul", "title": "Короткая медитация", "streak": 7, "done": false}], "family": {"people": [{"id": "p1", "name": "Мама", "role": "родители"}, {"id": "p2", "name": "Папа", "role": "родители"}, {"id": "p3", "name": "Свекровь", "role": "семья мужа"}, {"id": "p4", "name": "Старший сын", "role": "сын"}, {"id": "p5", "name": "Дочь", "role": "дочь"}, {"id": "p6", "name": "Младший сын", "role": "сын"}], "schedule": {"1": ["p1"], "2": ["p4"], "3": ["p2"], "4": ["p5"], "5": ["p3"], "6": ["p6"], "0": ["p1", "p2"]}}, "task_categories": {"blog": "Блог", "clients": "Клиенты", "learning": "Обучение"}, "tasks": [{"id": "t1", "category": "blog", "sphere": "work", "title": "Снять Reels", "limit_min": 40, "spent_min": 0, "extensions": 0, "done": false}, {"id": "t2", "category": "blog", "sphere": "work", "title": "Подготовить сторис на завтра", "limit_min": 20, "spent_min": 0, "extensions": 0, "done": false}, {"id": "t3", "category": "clients", "sphere": "work", "title": "Ответить в рабочем чате", "limit_min": 30, "spent_min": 35, "extensions": 1, "done": true}, {"id": "t4", "category": "learning", "sphere": "growth", "title": "Урок курса или чтение", "limit_min": 40, "spent_min": 0, "extensions": 0, "done": false}], "goals": [{"id": "g1", "horizon": "month", "sphere": "beauty", "title": "Фейс-фитнес утром и вечером каждый день", "detail": "Прогресс считается по дням, когда отмечены оба фейс-фитнеса.", "progress": 0.4, "example": true}, {"id": "g2", "horizon": "month", "sphere": "body", "title": "Силовая тренировка каждый день", "detail": "Впиши свою цель на месяц.", "progress": 0.2, "example": true}, {"id": "g3", "horizon": "6m", "sphere": "work", "title": "Финансовая цель на полгода", "detail": "Впиши сумму и срок.", "progress": 0.1, "example": true}, {"id": "g4", "horizon": "year", "sphere": "work", "title": "Запустить Telegram-канал", "detail": "Telegram стоит первым в планах развития блога. Впиши свою формулировку цели.", "progress": 0, "example": true}, {"id": "g5", "horizon": "5y", "sphere": "growth", "title": "Большая цель на пять лет", "detail": "Впиши свою большую цель.", "progress": 0, "example": true}], "horizons": [{"id": "month", "name": "На месяц"}, {"id": "6m", "name": "На 6 месяцев"}, {"id": "year", "name": "На год"}, {"id": "5y", "name": "На 5 лет"}], "ideas": [{"id": "i1", "text": "Идея для проекта", "date": "2026-09-15", "done": false}, {"id": "i2", "text": "Идея для поста", "date": "2026-09-16", "done": false}, {"id": "i3", "text": "Идея для Reels", "date": "2026-09-17", "done": false}], "books": [{"id": "b1", "title": "Книга, которую читаешь сейчас", "status": "now", "example": true}, {"id": "b2", "title": "Книга, которую хочешь прочитать", "status": "want", "example": true}, {"id": "b3", "title": "Прочитанная книга", "status": "done", "example": true}], "courses": [{"id": "c1", "title": "Обучение, которое проходишь сейчас", "status": "now", "example": true}, {"id": "c2", "title": "Обучение, которое хочешь пройти", "status": "want", "example": true}]};
+  var DEMO = {"user": {"id": "demo", "name": "Зебо"}, "settings": {"balance_threshold": 0.9, "default_timer_min": 40, "extend_min": 10}, "balance_streak": 0, "spheres": [{"id": "body", "name": "Тело", "icon": "🧘‍♀️", "color": "#F4A05A"}, {"id": "beauty", "name": "Красота", "icon": "🌸", "color": "#E98C8C"}, {"id": "soul", "name": "Душа", "icon": "🕊️", "color": "#B39AD1"}, {"id": "family", "name": "Семья", "icon": "🤍", "color": "#E9B949"}, {"id": "work", "name": "Работа", "icon": "💼", "color": "#86AE8C"}, {"id": "growth", "name": "Развитие", "icon": "📖", "color": "#7EA6C8"}], "habits": [{"id": "juice", "block": "morning", "sphere": "body", "title": "Утренний сок", "streak": 0, "done": false}, {"id": "med_morning", "block": "morning", "sphere": "soul", "title": "Утренняя медитация", "streak": 0, "done": false}, {"id": "mfr_morning", "block": "morning", "sphere": "body", "title": "МФР / йога", "streak": 0, "done": false}, {"id": "ff_morning", "block": "morning", "sphere": "beauty", "title": "Фейс-фитнес", "streak": 0, "done": false}, {"id": "strength", "block": "day", "sphere": "body", "title": "Силовая тренировка", "streak": 0, "done": false}, {"id": "salad", "block": "evening", "sphere": "body", "title": "Вечерний салат", "streak": 0, "done": false}, {"id": "mfr_evening", "block": "evening", "sphere": "body", "title": "МФР / йога", "streak": 0, "done": false}, {"id": "ff_evening", "block": "evening", "sphere": "beauty", "title": "Фейс-фитнес", "streak": 0, "done": false}, {"id": "med_evening", "block": "evening", "sphere": "soul", "title": "Короткая медитация", "streak": 0, "done": false}], "family": {"people": [{"id": "p1", "name": "Мама", "role": "родители"}, {"id": "p2", "name": "Папа", "role": "родители"}, {"id": "p3", "name": "Свекровь", "role": "семья мужа"}, {"id": "p4", "name": "Старший сын", "role": "сын"}, {"id": "p5", "name": "Дочь", "role": "дочь"}, {"id": "p6", "name": "Младший сын", "role": "сын"}], "schedule": {"1": ["p1"], "2": ["p4"], "3": ["p2"], "4": ["p5"], "5": ["p3"], "6": ["p6"], "0": ["p1", "p2"]}}, "task_categories": {"blog": "Блог", "clients": "Клиенты", "learning": "Обучение"}, "tasks": [], "goals": [], "horizons": [{"id": "month", "name": "На месяц"}, {"id": "6m", "name": "На 6 месяцев"}, {"id": "year", "name": "На год"}, {"id": "5y", "name": "На 5 лет"}], "ideas": [], "books": [], "courses": []};
   var timer = null; // {id, start, limitMs, prompted}
   var LIMITS = [20, 30, 40, 60, 90];
   var $app = document.getElementById('app');
@@ -322,7 +322,9 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
           '<div class="tbody"><div class="title">' + esc(t.title) + '</div>' +
           '<div class="tmeta"><span class="tag">' + esc(S.task_categories[t.category] || t.category) + '</span>' + esc(meta.join(', ')) + '</div></div>' +
           '<div class="tctrl">' + ctrl + '</div></div>';
-      }).join('') + '</div></section>';
+      }).join('') +
+      (S.tasks.length ? '' : '<p class="week">На сегодня задач нет. Добавь первую.</p>') +
+      '</div><button class="week" data-act="new-task">+ Добавить задачу</button></section>';
 
     var month = S.goals.filter(function(g){ return g.horizon === 'month'; });
     html += '<section class="block"><h2>🌿 Фокус месяца</h2><div class="list">' + month.map(goalRow).join('') +
@@ -545,6 +547,41 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
       case 'save-idea-inline': addIdea(document.getElementById('ideaInput').value); render(); break;
       case 'idea':
         S.ideas.forEach(function(x){ if (x.id === id) x.done = !x.done; }); haptic('success'); render(); break;
+      case 'new-task':
+        openModal('<h3>Новая задача</h3>' +
+          '<input class="field" id="taskText" placeholder="Что сделать" style="width:100%">' +
+          '<p class="group">Сколько минут</p><div class="family" id="taskLimit">' +
+          LIMITS.map(function(m, i){
+            return '<button class="person' + (m === 40 ? ' done' : '') + '" data-act="pick-limit" data-id="' + m + '"><span class="title">' + m + ' мин</span></button>';
+          }).join('') + '</div>' +
+          '<p class="group">Куда отнести</p><div class="family" id="taskCat">' +
+          Object.keys(S.task_categories).map(function(c, i){
+            return '<button class="person' + (i === 0 ? ' done' : '') + '" data-act="pick-cat" data-id="' + esc(c) + '"><span class="title">' + esc(S.task_categories[c]) + '</span></button>';
+          }).join('') + '</div>' +
+          '<div class="btns"><button class="btn" data-act="close">Отмена</button><button class="btn main" data-act="save-task">Добавить</button></div>');
+        setTimeout(function(){ var f = document.getElementById('taskText'); f && f.focus(); }, 50);
+        break;
+      case 'pick-limit':
+        var pl = document.querySelectorAll('#taskLimit .person');
+        for (var q = 0; q < pl.length; q++) pl[q].classList.toggle('done', pl[q] === el);
+        break;
+      case 'pick-cat':
+        var pc = document.querySelectorAll('#taskCat .person');
+        for (var w = 0; w < pc.length; w++) pc[w].classList.toggle('done', pc[w] === el);
+        break;
+      case 'save-task':
+        var tt = document.getElementById('taskText').value.trim();
+        var lm = document.querySelector('#taskLimit .person.done');
+        var ct = document.querySelector('#taskCat .person.done');
+        if (tt) S.tasks.push({
+          id: 't' + Date.now(),
+          category: ct ? ct.getAttribute('data-id') : Object.keys(S.task_categories)[0],
+          sphere: 'work',
+          title: tt,
+          limit_min: lm ? parseInt(lm.getAttribute('data-id'), 10) : 40,
+          spent_min: 0, spent: 0, extensions: 0, done: false
+        });
+        closeModal(); render(); break;
       case 'new-goal':
         var hz = S.horizons.filter(function(x){ return x.id === id; })[0];
         openModal('<h3>Цель ' + esc(hz ? hz.name.toLowerCase() : '') + '</h3>' +
