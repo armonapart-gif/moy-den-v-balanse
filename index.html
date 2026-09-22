@@ -529,8 +529,11 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
   }
   function shareToBot(kind){
     var text = exportText(kind);
-    if (text.length > 3900) text = text.slice(0, 3890) + '…';
-    try { tg.openTelegramLink('https://t.me/' + BOT + '?text=' + encodeURIComponent(text)); } catch(e){}
+    if (text.length > 3800) text = text.slice(0, 3790) + '…';
+    try { navigator.clipboard && navigator.clipboard.writeText(text); } catch(e){}
+    /* прямая ссылка t.me/бот?text= внутри мини-приложения не срабатывает — идём через окно «Поделиться» */
+    var link = 'https://t.me/share/url?url=' + encodeURIComponent('https://t.me/' + BOT) + '&text=' + encodeURIComponent('\n' + text);
+    try { tg.openTelegramLink(link); } catch(e){}
   }
 
   function fmtDate(s){
@@ -757,9 +760,9 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
         render(); break;
       case 'week': weekSchedule(); break;
       case 'share':
-        el.classList.add('sent'); el.textContent = 'Открываю чат…'; haptic('success');
+        el.classList.add('sent'); el.textContent = 'Выбери чат с Нисо в окне «Поделиться»'; haptic('success');
         setTimeout(function(){ shareToBot(id); }, 250);
-        setTimeout(function(){ render(); }, 3000);
+        setTimeout(function(){ render(); }, 6000);
         break;
       case 'summary': summary(); break;
       case 'close': closeModal(); break;
