@@ -26,6 +26,14 @@
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.4}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
 button:focus-visible{outline:2px solid var(--apricot-deep);outline-offset:2px;border-radius:10px}
+button{transition:transform .12s,background-color .15s,filter .15s;-webkit-tap-highlight-color:transparent}
+button:active{transform:scale(.96);filter:brightness(.92)}
+.row:active,.goal:active,.add:active,.week:active,.tab:active{background:var(--bg);transform:none}
+.person:active,.limit:active{background:var(--blush)}
+.play:active,.small-btn:active,.cta:active,.btn.main:active{background:var(--apricot-deep)}
+.share{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:14px;border-radius:16px;background:var(--apricot);color:#fff;font-size:15px;font-weight:600;box-shadow:0 4px 12px rgba(224,123,57,.25)}
+.share:active{background:var(--apricot-deep);transform:scale(.97)}
+.share.sent{background:var(--sage)}
 .app{max-width:480px;margin:0 auto;padding:18px 16px calc(190px + env(safe-area-inset-bottom))}
 
 /* Шапка */
@@ -445,7 +453,7 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
         list.map(goalRow).join('') +
         '<button class="add" data-act="new-goal" data-id="' + hz.id + '">+ Добавить цель</button></div></section>';
     });
-    if (tg) html += '<div class="list"><button class="week" data-act="share" data-id="goals">Отправить цели Нисо</button></div>';
+    if (tg) html += '<button class="share" data-act="share" data-id="goals">💬 Отправить цели и задачи Нисо</button>';
     return html;
   }
 
@@ -485,7 +493,7 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
       }).join('') + '</div><p class="hint">Отметь галочкой, когда внедрила.</p></section>';
     html += renderShelf('books', 'Книги', '📚');
     html += renderShelf('courses', 'Обучение', '🎓');
-    if (tg) html += '<div class="list"><button class="week" data-act="share" data-id="vault">Отправить копилку Нисо</button></div>';
+    if (tg) html += '<button class="share" data-act="share" data-id="vault">💬 Отправить копилку Нисо</button>';
     return html;
   }
 
@@ -501,6 +509,10 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
         out.push('', hz.name + ':');
         list.forEach(function(g){ out.push('• ' + sphere(g.sphere).icon + ' ' + g.title + (g.detail ? ' — ' + g.detail : '') + (g.progress ? ' (' + g.progress + '%)' : '')); });
       });
+      if (S.tasks.length) {
+        out.push('', 'Задачи дня:');
+        S.tasks.forEach(function(t){ out.push('• ' + (t.done ? '✓ ' : '') + t.title + ' — ' + (S.task_categories[t.category] || t.category) + ', ' + t.limit_min + ' мин' + (t.spent > 60 ? ', потрачено ' + mins(t.spent) : '')); });
+      }
       if (out.length === 1) out.push('пока пусто');
     } else {
       out.push('Копилка из «Мой день» на ' + todayISO());
@@ -744,7 +756,11 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
         S[k3].forEach(function(x){ if (x.id === id) x.status = ORDER[(ORDER.indexOf(x.status) + 1) % ORDER.length]; });
         render(); break;
       case 'week': weekSchedule(); break;
-      case 'share': shareToBot(id); break;
+      case 'share':
+        el.classList.add('sent'); el.textContent = 'Открываю чат…'; haptic('success');
+        setTimeout(function(){ shareToBot(id); }, 250);
+        setTimeout(function(){ render(); }, 3000);
+        break;
       case 'summary': summary(); break;
       case 'close': closeModal(); break;
     }
