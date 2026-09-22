@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ru" style="background:#FFF3E6;color-scheme:light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Мой день в балансе</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{
+  --bg:#FFF3E6;
+  --paper:#FFFBF6;
+  --apricot:#F4A05A;
+  --apricot-deep:#E07B39;
+  --blush:#F7D3B8;
+  --ink:#43291B;
+  --muted:#9A7A66;
+  --line:#F1DCC9;
+  --sage:#8DB08F;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.4}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+button:focus-visible{outline:2px solid var(--apricot-deep);outline-offset:2px;border-radius:10px}
+.app{max-width:480px;margin:0 auto;padding:18px 16px calc(190px + env(safe-area-inset-bottom))}
+
+/* Шапка */
+.hello{font-family:var(--serif);font-size:26px;line-height:1.15;margin:4px 0 2px}
+.date{color:var(--muted);font-size:14px;margin:0}
+
+/* Колесо — главный акцент */
+.hero{margin:18px 0 8px;display:flex;flex-direction:column;align-items:center}
+.wheel{width:230px;height:230px}
+.hero-stats{display:flex;gap:10px;margin-top:6px;width:100%}
+.stat{flex:1;background:var(--paper);border-radius:18px;padding:10px 12px;border:1px solid var(--line)}
+.stat b{display:block;font-family:var(--serif);font-size:24px;line-height:1.1}
+.stat span{font-size:13px;color:var(--muted)}
+.legend{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px;width:100%}
+.lg{display:flex;align-items:center;gap:6px;font-size:13px;background:var(--paper);border-radius:12px;padding:6px 8px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.lg em{font-style:normal;color:var(--muted);margin-left:auto}
+
+/* Секции */
+.block{margin-top:22px}
+.block h2{font-family:var(--serif);font-weight:normal;font-size:21px;margin:0 0 8px;display:flex;align-items:baseline;gap:8px}
+.block h2 small{font-family:var(--sans);font-size:13px;color:var(--muted)}
+.list{background:var(--paper);border-radius:22px;border:1px solid var(--line);overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 14px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.check{width:26px;height:26px;border-radius:50%;border:2px solid var(--blush);flex:none;display:grid;place-items:center;transition:background .2s,border-color .2s}
+.done .check{background:var(--apricot);border-color:var(--apricot)}
+.done .check::after{content:"";width:10px;height:6px;border-left:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:translateY(-1px) rotate(-45deg)}
+.done .title{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--blush)}
+.title{flex:1}
+.streak{font-size:13px;color:var(--apricot-deep);white-space:nowrap}
+.sub{font-size:12px;color:var(--muted);display:block;margin-top:1px}
+
+/* Семья */
+.family{display:flex;gap:10px;flex-wrap:wrap}
+.person{display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:8px 16px 8px 8px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--blush);display:grid;place-items:center;font-family:var(--serif);font-size:17px}
+.person.done .avatar{background:var(--sage);color:#fff}
+.person .title{text-decoration:none}
+.person.done .title{color:var(--ink);text-decoration:none}
+.week{font-size:13px;color:var(--muted);margin-top:8px}
+
+/* Задачи */
+.task{display:flex;align-items:center;gap:12px;padding:13px 14px;border-top:1px solid var(--line)}
+.task:first-child{border-top:0}
+.task.active{background:#FFF0E0}
+.tbody{flex:1;min-width:0}
+.tag{display:inline-block;font-size:12px;padding:1px 8px;border-radius:999px;background:var(--bg);color:var(--apricot-deep);margin-right:4px}
+.tmeta{font-size:12px;color:var(--muted);margin-top:3px}
+.tctrl{display:flex;align-items:center;gap:6px;flex:none}
+.limit{font-size:13px;padding:6px 9px;border-radius:10px;background:var(--bg);color:var(--ink)}
+.play{width:36px;height:36px;border-radius:50%;background:var(--apricot);color:#fff;display:grid;place-items:center;font-size:13px}
+.stop{background:var(--ink)}
+.cd{font-variant-numeric:tabular-nums;font-size:15px;font-weight:600;color:var(--apricot-deep)}
+.cd.over{color:#C2553A}
+
+/* Цели */
+.goal{display:block;width:100%;text-align:left;padding:13px 14px;border-top:1px solid var(--line)}
+.goal:first-child{border-top:0}
+.goal-top{display:flex;align-items:center;gap:8px}
+.bar{height:6px;border-radius:6px;background:var(--bg);margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px}
+.goal-detail{font-size:14px;color:var(--muted);margin-top:8px;display:none}
+.goal.open .goal-detail{display:block}
+.example{font-size:11px;color:var(--muted);border:1px dashed var(--blush);border-radius:6px;padding:0 5px;margin-left:auto}
+
+/* Нижняя панель */
+.dock{position:fixed;left:0;right:0;bottom:0;padding:10px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--bg) 70%,rgba(255,243,230,0))}
+.dock-in{max-width:448px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.runbar{display:none;align-items:center;gap:10px;background:var(--ink);color:#fff;border-radius:16px;padding:10px 14px;font-size:14px}
+.runbar.show{display:flex}
+.runbar .rt{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.runbar .cd{color:var(--blush)}
+.cta{width:100%;background:var(--apricot);color:#fff;border-radius:18px;padding:15px;font-size:17px;font-weight:600}
+
+/* Модалка */
+.overlay{position:fixed;inset:0;background:rgba(67,41,27,.35);display:none;align-items:flex-end;justify-content:center;z-index:10}
+.overlay.show{display:flex}
+.sheet{background:var(--paper);width:100%;max-width:480px;max-height:88vh;overflow:auto;border-radius:26px 26px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom))}
+.sheet h3{font-family:var(--serif);font-weight:normal;font-size:24px;margin:0 0 6px}
+.sheet p{margin:6px 0}
+.sheet .btns{display:flex;gap:10px;margin-top:16px}
+.btn{flex:1;padding:14px;border-radius:16px;font-weight:600;background:var(--bg)}
+.btn.main{background:var(--apricot);color:#fff}
+.sum-h{font-size:14px;color:var(--muted);margin:16px 0 6px}
+.sum-row{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line);font-size:15px}
+.coach{background:var(--bg);border-radius:16px;padding:12px 14px;margin-top:16px;font-size:14px}
+
+/* Заглушка */
+.demo-note{font-size:12px;color:var(--muted);background:var(--paper);border:1px dashed var(--blush);border-radius:10px;padding:5px 10px;margin:0 0 10px;display:inline-block}
+.empty{text-align:center;padding:80px 20px}
+.empty .big{font-size:48px}
+.empty h1{font-family:var(--serif);font-weight:normal;font-size:24px;margin:12px 0 6px}
+.empty p{color:var(--muted);margin:0 0 20px}
+.empty .cta{max-width:260px}
+
+
+.top{display:flex;align-items:flex-start;gap:10px}
+.top>div{flex:1}
+.idea-btn{width:44px;height:44px;border-radius:50%;background:var(--paper);border:1px solid var(--line);font-size:20px;flex:none}
+.tabs{display:flex;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:4px}
+.tab{flex:1;padding:7px 4px;border-radius:14px;font-size:12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:1px}
+.tab i{font-style:normal;font-size:18px}
+.tab.on{background:var(--bg);color:var(--ink);font-weight:600}
+.page-title{font-family:var(--serif);font-size:28px;margin:4px 0 4px;font-weight:normal}
+.lead{color:var(--muted);font-size:14px;margin:0}
+.link{font-size:13px;color:var(--apricot-deep);margin-top:8px}
+.add{display:block;width:100%;text-align:left;padding:12px 14px;border-top:1px solid var(--line);color:var(--apricot-deep);font-size:15px}
+.add:first-child{border-top:0}
+.capture{display:flex;gap:8px;margin-bottom:10px}
+.field{flex:1;font:inherit;font-size:16px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:11px 12px;min-width:0}
+.field:focus{outline:2px solid var(--apricot);border-color:transparent}
+textarea.field{width:100%;min-height:96px;resize:vertical}
+.small-btn{background:var(--apricot);color:#fff;border-radius:14px;padding:0 16px;font-weight:600}
+.idate{font-size:12px;color:var(--muted);white-space:nowrap}
+.group{font-size:13px;color:var(--muted);margin:12px 4px 6px}
+.status{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--bg);color:var(--apricot-deep);white-space:nowrap}
+.hint{font-size:12px;color:var(--muted);margin:6px 4px 0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app"><div class="empty"><div class="big">🍑</div><p>Загружаю твой день…</p></div></div>
+
+<div class="dock" id="dock" hidden>
+  <div class="dock-in">
+    <div class="runbar" id="runbar">
+      <span>⏱</span><span class="rt" id="runTitle"></span><span class="cd" id="runCd"></span>
+      <button class="play stop" data-act="stop" aria-label="Остановить таймер">■</button>
+    </div>
+    <button class="cta" id="sumBtn" data-act="summary">Итоги дня</button>
+    <nav class="tabs">
+      <button class="tab" data-act="tab" data-id="today"><i>☀️</i>Сегодня</button>
+      <button class="tab" data-act="tab" data-id="goals"><i>🎯</i>Цели</button>
+      <button class="tab" data-act="tab" data-id="vault"><i>💡</i>Копилка</button>
+    </nav>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"><div class="sheet" id="sheet"></div></div>
+
+<script>
+(function(){
+  var tg = window.Telegram && window.Telegram.WebApp;
+  if (tg) {
+    try {
+      tg.ready();
+      tg.expand();
+      if (tg.setHeaderColor) tg.setHeaderColor('#FFF3E6');
+      if (tg.setBackgroundColor) tg.setBackgroundColor('#FFF3E6');
+    } catch (e) {}
+  }
+
+
+  /* ---------- хранилище: Telegram CloudStorage + localStorage ---------- */
+  var LS_KEY = 'mdb_state_v1', CHUNK = 3800;
+  var cloud = (function(){
+    try { return tg && tg.CloudStorage && tg.isVersionAtLeast && tg.isVersionAtLeast('6.9') ? tg.CloudStorage : null; } catch(e){ return null; }
+  })();
+  var storageOk = !!cloud || (function(){ try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; } catch(e){ return false; } })();
+
+  function todayISO(){ var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth()+1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+
+  function snapshot(){
+    return {
+      day: S.day || todayISO(),
+      balance_streak: S.balance_streak || 0,
+      habits: S.habits.map(function(h){ return {id:h.id, done:!!h.done, streak:h.streak||0}; }),
+      family_done: S.family.done || {},
+      tasks: S.tasks.map(function(t){ return {id:t.id, category:t.category, sphere:t.sphere, title:t.title, limit_min:t.limit_min,
+        spent_min: Math.round((t.spent||0)/60), extensions:t.extensions||0, done:!!t.done}; }),
+      goals: S.goals, ideas: S.ideas, books: S.books, courses: S.courses
+    };
+  }
+
+  var saveTimer = null;
+  function persist(){
+    if (!S || S._noStore) return;
+    var json = JSON.stringify(snapshot());
+    try { localStorage.setItem(LS_KEY, json); } catch(e){}
+    if (!cloud) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){ cloudWrite(json); }, 300);
+  }
+  function cloudWrite(json){
+    var parts = [];
+    for (var i = 0; i < json.length; i += CHUNK) parts.push(json.slice(i, i + CHUNK));
+    var pending = parts.length + 1;
+    function done(){ if (--pending === 0) cloud.getKeys(function(err, keys){
+      if (err || !keys) return;
+      var stale = keys.filter(function(k){ return /^c\d+$/.test(k) && parseInt(k.slice(1), 10) >= parts.length; });
+      if (stale.length) cloud.removeItems(stale, function(){});
+    }); }
+    parts.forEach(function(chunk, i){ cloud.setItem('c' + i, chunk, done); });
+    cloud.setItem('n', String(parts.length), done);
+  }
+  function cloudRead(cb){
+    if (!cloud) return cb(null);
+    cloud.getItem('n', function(err, n){
+      n = parseInt(n, 10);
+      if (err || !n) return cb(null);
+      var keys = []; for (var i = 0; i < n; i++) keys.push('c' + i);
+      cloud.getItems(keys, function(err2, vals){
+        if (err2 || !vals) return cb(null);
+        var json = keys.map(function(k){ return vals[k] || ''; }).join('');
+        try { cb(JSON.parse(json)); } catch(e){ cb(null); }
+      });
+    });
+  }
+  function localRead(){ try { return JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch(e){ return null; } }
+
+  function applySaved(saved){
+    if (!saved) return;
+    S.day = saved.day; S.balance_streak = saved.balance_streak || 0;
+    (saved.habits || []).forEach(function(sh){ S.habits.forEach(function(h){ if (h.id === sh.id) { h.done = sh.done; h.streak = sh.streak; } }); });
+    S.family.done = saved.family_done || {};
+    if (saved.tasks) { S.tasks = saved.tasks; S.tasks.forEach(function(t){ t.spent = (t.spent_min || 0) * 60; t.extensions = t.extensions || 0; }); }
+    if (saved.goals) S.goals = saved.goals;
+    if (saved.ideas) S.ideas = saved.ideas;
+    if (saved.books) S.books = saved.books;
+    if (saved.courses) S.courses = saved.courses;
+  }
+
+  /* новый день: закрываем вчерашний — серии, сброс галочек */
+  function rollover(){
+    var today = todayISO();
+    if (!S.day) { S.day = today; return; }
+    if (S.day === today) return;
+    var st = stats();
+    S.balance_streak = st.counted ? (S.balance_streak || 0) + 1 : 0;
+    S.habits.forEach(function(h){ h.streak = h.done ? (h.streak||0) + 1 : 0; h.done = false; });
+    S.family.done = {};
+    S.tasks = S.tasks.filter(function(t){ return !t.done; });
+    S.tasks.forEach(function(t){ t.spent = 0; t.spent_min = 0; t.extensions = 0; });
+    S.day = today;
+  }
+
+  var S = null;
+  var DEMO = {"user": {"id": "demo", "name": "Зебо"}, "settings": {"balance_threshold": 0.9, "default_timer_min": 40, "extend_min": 10}, "balance_streak": 0, "spheres": [{"id": "body", "name": "Тело", "icon": "🧘‍♀️", "color": "#F4A05A"}, {"id": "beauty", "name": "Красота", "icon": "🌸", "color": "#E98C8C"}, {"id": "soul", "name": "Душа", "icon": "🕊️", "color": "#B39AD1"}, {"id": "family", "name": "Семья", "icon": "🤍", "color": "#E9B949"}, {"id": "work", "name": "Работа", "icon": "💼", "color": "#86AE8C"}, {"id": "growth", "name": "Развитие", "icon": "📖", "color": "#7EA6C8"}], "habits": [{"id": "juice", "block": "morning", "sphere": "body", "title": "Утренний сок", "streak": 0, "done": false}, {"id": "med_morning", "block": "morning", "sphere": "soul", "title": "Утренняя медитация", "streak": 0, "done": false}, {"id": "mfr_morning", "block": "morning", "sphere": "body", "title": "МФР / йога", "streak": 0, "done": false}, {"id": "ff_morning", "block": "morning", "sphere": "beauty", "title": "Фейс-фитнес", "streak": 0, "done": false}, {"id": "strength", "block": "day", "sphere": "body", "title": "Силовая тренировка", "streak": 0, "done": false}, {"id": "salad", "block": "evening", "sphere": "body", "title": "Вечерний салат", "streak": 0, "done": false}, {"id": "mfr_evening", "block": "evening", "sphere": "body", "title": "МФР / йога", "streak": 0, "done": false}, {"id": "ff_evening", "block": "evening", "sphere": "beauty", "title": "Фейс-фитнес", "streak": 0, "done": false}, {"id": "med_evening", "block": "evening", "sphere": "soul", "title": "Короткая медитация", "streak": 0, "done": false}], "family": {"people": [{"id": "p1", "name": "Мама", "role": "родители"}, {"id": "p2", "name": "Папа", "role": "родители"}, {"id": "p3", "name": "Свекровь", "role": "семья мужа"}, {"id": "p4", "name": "Старший сын", "role": "сын"}, {"id": "p5", "name": "Дочь", "role": "дочь"}, {"id": "p6", "name": "Младший сын", "role": "сын"}], "schedule": {"1": ["p1"], "2": ["p4"], "3": ["p2"], "4": ["p5"], "5": ["p3"], "6": ["p6"], "0": ["p1", "p2"]}}, "task_categories": {"blog": "Блог", "clients": "Клиенты", "learning": "Обучение"}, "tasks": [], "goals": [], "horizons": [{"id": "month", "name": "На месяц"}, {"id": "6m", "name": "На 6 месяцев"}, {"id": "year", "name": "На год"}, {"id": "5y", "name": "На 5 лет"}], "ideas": [], "books": [], "courses": []};
+  var timer = null; // {id, start, limitMs, prompted}
+  var LIMITS = [20, 30, 40, 60, 90];
+  var $app = document.getElementById('app');
+
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function haptic(type){ try { tg && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred(type || 'success'); } catch(e){} }
+  function sphere(id){ return S.spheres.filter(function(s){ return s.id === id; })[0] || {name:id,color:'#ccc',icon:''}; }
+  function fmt(sec){ sec = Math.max(0, Math.round(sec)); var m = Math.floor(sec/60), s = sec%60; return (m<10?'0':'')+m+':'+(s<10?'0':'')+s; }
+  function mins(sec){ return Math.round(sec/60); }
+
+  /* ---------- загрузка ---------- */
+  function load(){
+    $app.innerHTML = '<div class="empty"><div class="big">🍑</div><p>Загружаю твой день…</p></div>';
+    fetch('data.json?v=' + Date.now(), {cache:'no-store'})
+      .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function(d){ S = d; prepare(); restore(); })
+      .catch(function(){
+        if (DEMO) {
+          S = JSON.parse(JSON.stringify(DEMO)); S._demo = true; prepare(); restore();
+          return;
+        }
+        document.getElementById('dock').hidden = true;
+        $app.innerHTML = '<div class="empty"><div class="big">🍑</div><h1>День не загрузился</h1>' +
+          '<p>Приложение не видит файл data.json. Проверь, что он лежит рядом с index.html.</p>' +
+          '<button class="cta" data-act="retry">Загрузить снова</button></div>';
+      });
+  }
+
+  function restore(){
+    var local = localRead();
+    cloudRead(function(remote){
+      applySaved(remote || local);
+      rollover();
+      S._noStore = !storageOk;
+      render(); persist();
+      document.getElementById('dock').hidden = false;
+    });
+  }
+
+  function prepare(){
+    S.tasks.forEach(function(t){ t.spent = (t.spent_min || 0) * 60; t.extensions = t.extensions || 0; });
+    S.family.done = S.family.done || {};
+    S.horizons = S.horizons || []; S.goals = S.goals || [];
+    S.ideas = S.ideas || []; S.books = S.books || []; S.courses = S.courses || [];
+  }
+
+  /* ---------- расчёты ---------- */
+  function familyToday(){
+    var ids = S.family.schedule[String(new Date().getDay())] || [];
+    return ids.map(function(id){ return S.family.people.filter(function(p){ return p.id === id; })[0]; }).filter(Boolean);
+  }
+  function items(){
+    var arr = [];
+    S.habits.forEach(function(h){ arr.push({sphere:h.sphere, done:!!h.done, title:h.title}); });
+    familyToday().forEach(function(p){ arr.push({sphere:'family', done:!!S.family.done[p.id], title:'Внимание: ' + p.name}); });
+    S.tasks.forEach(function(t){ arr.push({sphere:t.sphere, done:!!t.done, title:t.title}); });
+    return arr;
+  }
+  function stats(){
+    var all = items(), done = all.filter(function(i){ return i.done; }).length;
+    var by = {};
+    S.spheres.forEach(function(s){
+      var list = all.filter(function(i){ return i.sphere === s.id; });
+      by[s.id] = list.length ? list.filter(function(i){ return i.done; }).length / list.length : 0;
+    });
+    var th = S.settings.balance_threshold;
+    return {all:all, done:done, total:all.length, pct: all.length ? done/all.length : 0, by:by,
+            need: Math.max(0, Math.ceil(th*all.length - 1e-9) - done), counted: all.length && done/all.length >= th};
+  }
+
+  /* ---------- колесо ---------- */
+  function wheel(by){
+    var cx = 115, cy = 115, R = 108, r0 = 30, n = S.spheres.length, gap = 0.05;
+    function pt(r,a){ return [cx + r*Math.cos(a), cy + r*Math.sin(a)]; }
+    function arc(ri, ro, a0, a1){
+      var p0 = pt(ro,a0), p1 = pt(ro,a1), p2 = pt(ri,a1), p3 = pt(ri,a0);
+      return 'M'+p0[0]+' '+p0[1]+'A'+ro+' '+ro+' 0 0 1 '+p1[0]+' '+p1[1]+'L'+p2[0]+' '+p2[1]+'A'+ri+' '+ri+' 0 0 0 '+p3[0]+' '+p3[1]+'Z';
+    }
+    var st = stats(), svg = '<svg class="wheel" viewBox="0 0 230 230" role="img" aria-label="Колесо баланса дня">';
+    S.spheres.forEach(function(s, i){
+      var a0 = -Math.PI/2 + i*2*Math.PI/n + gap, a1 = a0 + 2*Math.PI/n - 2*gap, p = by[s.id];
+      svg += '<path d="'+arc(r0,R,a0,a1)+'" fill="'+s.color+'" opacity=".16"/>';
+      if (p > 0) svg += '<path d="'+arc(r0, r0+(R-r0)*p, a0, a1)+'" fill="'+s.color+'"/>';
+      var m = pt(R-18, (a0+a1)/2);
+      svg += '<text x="'+m[0]+'" y="'+(m[1]+6)+'" text-anchor="middle" font-size="16">'+s.icon+'</text>';
+    });
+    svg += '<circle cx="'+cx+'" cy="'+cy+'" r="'+(r0-3)+'" fill="#FFFBF6"/>';
+    svg += '<text x="'+cx+'" y="'+(cy+6)+'" text-anchor="middle" font-family="Georgia,serif" font-size="17" fill="#43291B">'+Math.round(st.pct*100)+'%</text>';
+    return svg + '</svg>';
+  }
+
+  /* ---------- отрисовка ---------- */
+  function renderToday(){
+    var st = stats(), now = new Date(), h = now.getHours();
+    var greet = h < 12 ? 'Доброе утро' : h < 18 ? 'Добрый день' : 'Добрый вечер';
+    var date = now.toLocaleDateString('ru-RU', {weekday:'long', day:'numeric', month:'long'});
+    var streak = S.balance_streak + (st.counted ? 1 : 0);
+
+    var html = (S._noStore ? '<p class="demo-note">Отметки не сохраняются: открой приложение через Telegram</p>' : '') + '<div class="top"><div><h1 class="hello">' + greet + ', ' + esc(S.user.name) + '</h1><p class="date">' + esc(date) + '</p></div>' +
+      '<button class="idea-btn" data-act="new-idea" aria-label="Записать идею">💡</button></div>';
+
+    html += '<section class="hero">' + wheel(st.by) +
+      '<div class="hero-stats">' +
+        '<div class="stat"><b>🔥 ' + streak + '</b><span>дней в балансе</span></div>' +
+        '<div class="stat"><b>' + st.done + ' из ' + st.total + '</b><span>' +
+          (st.counted ? 'день засчитан' : 'до ' + Math.round(S.settings.balance_threshold*100) + '% ещё ' + st.need) + '</span></div>' +
+      '</div><div class="legend">' +
+      S.spheres.map(function(s){ return '<div class="lg"><span class="dot" style="background:'+s.color+'"></span>'+esc(s.name)+'<em>'+Math.round(st.by[s.id]*100)+'%</em></div>'; }).join('') +
+      '</div></section>';
+
+    var blocks = [['morning','Утренний ритуал','☀️'],['day','В течение дня','💪'],['evening','Вечерний ритуал','🌙']];
+    blocks.forEach(function(b){
+      var list = S.habits.filter(function(x){ return x.block === b[0]; });
+      if (!list.length) return;
+      var d = list.filter(function(x){ return x.done; }).length;
+      html += '<section class="block"><h2>' + b[2] + ' ' + b[1] + ' <small>' + d + '/' + list.length + '</small></h2><div class="list">' +
+        list.map(function(x){
+          return '<button class="row' + (x.done?' done':'') + '" data-act="habit" data-id="'+esc(x.id)+'" aria-pressed="'+!!x.done+'">' +
+            '<span class="check"></span><span class="title">' + esc(x.title) + '</span>' +
+            '<span class="streak">🔥 ' + ((x.streak||0) + (x.done?1:0)) + '</span></button>';
+        }).join('') + '</div></section>';
+    });
+
+    var fam = familyToday();
+    html += '<section class="block"><h2>🤍 Уделить внимание</h2><div class="family">' +
+      (fam.length ? fam.map(function(p){
+        var done = !!S.family.done[p.id];
+        return '<button class="person' + (done?' done':'') + '" data-act="family" data-id="'+esc(p.id)+'" aria-pressed="'+done+'">' +
+          '<span class="avatar">' + (done ? '✓' : esc(p.name.charAt(0))) + '</span><span class="title">' + esc(p.name) + '<span class="sub">' + esc(p.role) + '</span></span></button>';
+      }).join('') : '<p class="week">Сегодня никого в графике</p>') +
+      '</div><button class="week" data-act="week">Посмотреть график на неделю</button></section>';
+
+    html += '<section class="block"><h2>🎯 Задачи дня</h2><div class="list">' +
+      S.tasks.map(function(t){
+        var active = timer && timer.id === t.id, ctrl;
+        if (active) {
+          ctrl = '<span class="cd" data-cd="'+esc(t.id)+'"></span><button class="play stop" data-act="stop" aria-label="Остановить">■</button>';
+        } else if (t.done) {
+          ctrl = '';
+        } else {
+          ctrl = '<button class="limit" data-act="limit" data-id="'+esc(t.id)+'">' + t.limit_min + ' мин</button>' +
+                 '<button class="play" data-act="start" data-id="'+esc(t.id)+'" aria-label="Запустить таймер">▶</button>';
+        }
+        var meta = [];
+        if (t.spent > 0) meta.push(mins(t.spent) + ' мин');
+        if (t.extensions > 0) meta.push('продлений: ' + t.extensions);
+        return '<div class="task' + (t.done?' done':'') + (active?' active':'') + '">' +
+          '<button class="check" data-act="task" data-id="'+esc(t.id)+'" aria-label="Отметить выполненной"></button>' +
+          '<div class="tbody"><div class="title">' + esc(t.title) + '</div>' +
+          '<div class="tmeta"><span class="tag">' + esc(S.task_categories[t.category] || t.category) + '</span>' + esc(meta.join(', ')) + '</div></div>' +
+          '<div class="tctrl">' + ctrl + '</div></div>';
+      }).join('') +
+      (S.tasks.length ? '' : '<p class="week">На сегодня задач нет. Добавь первую.</p>') +
+      '</div><button class="week" data-act="new-task">+ Добавить задачу</button></section>';
+
+    var month = S.goals.filter(function(g){ return g.horizon === 'month'; });
+    html += '<section class="block"><h2>🌿 Фокус месяца</h2><div class="list">' + month.map(goalRow).join('') +
+      '</div><button class="link" data-act="tab" data-id="goals">Все цели: 6 месяцев, год, 5 лет</button></section>';
+
+    return html;
+  }
+
+  function goalRow(g){
+    var s = sphere(g.sphere);
+    return '<button class="goal" data-act="goal">' +
+      '<div class="goal-top"><span>' + s.icon + '</span><span class="title">' + esc(g.title) + '</span>' +
+      (g.example ? '<span class="example">пример</span>' : '') + '</div>' +
+      '<div class="bar"><i style="width:' + Math.round((g.progress||0)*100) + '%;background:' + s.color + '"></i></div>' +
+      (g.detail ? '<div class="goal-detail">' + esc(g.detail) + '</div>' : '') + '</button>';
+  }
+
+  function renderGoals(){
+    var html = (S._demo ? '<p class="demo-note">Тестовые данные: отметки не сохраняются</p>' : '') +
+      '<h1 class="page-title">Мои цели</h1><p class="lead">От месяца до пяти лет. Нажми на цель, чтобы увидеть детали.</p>';
+    S.horizons.forEach(function(hz){
+      var list = S.goals.filter(function(g){ return g.horizon === hz.id; });
+      html += '<section class="block"><h2>' + esc(hz.name) + ' <small>' + list.length + '</small></h2><div class="list">' +
+        list.map(goalRow).join('') +
+        '<button class="add" data-act="new-goal" data-id="' + hz.id + '">+ Добавить цель</button></div></section>';
+    });
+    return html;
+  }
+
+  var STATUS = {
+    books:   {now:'Читаю', want:'Хочу прочитать', done:'Прочитала'},
+    courses: {now:'Прохожу', want:'Хочу пройти', done:'Прошла'}
+  };
+  var ORDER = ['now','want','done'];
+
+  function renderShelf(key, title, icon){
+    var html = '<section class="block"><h2>' + icon + ' ' + title + '</h2>';
+    ORDER.forEach(function(st){
+      var list = S[key].filter(function(x){ return x.status === st; });
+      if (!list.length) return;
+      html += '<div class="group">' + STATUS[key][st] + '</div><div class="list">' + list.map(function(x){
+        return '<button class="row" data-act="cycle" data-key="' + key + '" data-id="' + esc(x.id) + '">' +
+          '<span class="title">' + esc(x.title) + '</span>' +
+          (x.example ? '<span class="example">пример</span>' : '') +
+          '<span class="status">' + STATUS[key][x.status] + '</span></button>';
+      }).join('') + '</div>';
+    });
+    html += '<div class="list" style="margin-top:8px"><button class="add" data-act="new-item" data-key="' + key + '">+ Добавить</button></div>' +
+      '<p class="hint">Нажми на пункт, чтобы сменить статус.</p></section>';
+    return html;
+  }
+
+  function renderVault(){
+    var html = (S._demo ? '<p class="demo-note">Тестовые данные: отметки не сохраняются</p>' : '') +
+      '<h1 class="page-title">Копилка</h1><p class="lead">Идеи, книги и обучение. Записала мысль и вернулась к делу.</p>';
+    html += '<section class="block"><h2>💡 Идеи</h2>' +
+      '<div class="capture"><input class="field" id="ideaInput" placeholder="Что пришло в голову?" enterkeyhint="done">' +
+      '<button class="small-btn" data-act="save-idea-inline">Записать</button></div><div class="list">' +
+      S.ideas.slice().reverse().map(function(x){
+        return '<button class="row' + (x.done ? ' done' : '') + '" data-act="idea" data-id="' + esc(x.id) + '">' +
+          '<span class="check"></span><span class="title">' + esc(x.text) + '</span>' +
+          '<span class="idate">' + (x.done ? 'внедрено' : fmtDate(x.date)) + '</span></button>';
+      }).join('') + '</div><p class="hint">Отметь галочкой, когда внедрила.</p></section>';
+    html += renderShelf('books', 'Книги', '📚');
+    html += renderShelf('courses', 'Обучение', '🎓');
+    return html;
+  }
+
+  function fmtDate(s){
+    var d = new Date(s + 'T12:00:00');
+    return isNaN(d) ? '' : d.toLocaleDateString('ru-RU', {day:'numeric', month:'short'});
+  }
+
+  function render(){
+    S.tab = S.tab || 'today';
+    persist();
+    $app.innerHTML = S.tab === 'goals' ? renderGoals() : S.tab === 'vault' ? renderVault() : renderToday();
+    document.getElementById('sumBtn').style.display = S.tab === 'today' ? '' : 'none';
+    var tabs = document.querySelectorAll('.tab');
+    for (var i = 0; i < tabs.length; i++) tabs[i].classList.toggle('on', tabs[i].getAttribute('data-id') === S.tab);
+    tick();
+  }
+
+
+  /* ---------- таймер ---------- */
+  function task(id){ return S.tasks.filter(function(t){ return t.id === id; })[0]; }
+
+  function startTimer(id){
+    if (timer) stopTimer(false);
+    var t = task(id);
+    timer = {id:id, start:Date.now(), limitMs:t.limit_min*60000, prompted:false};
+    haptic('success');
+    render();
+  }
+  function stopTimer(finish){
+    if (!timer) return;
+    var t = task(timer.id);
+    t.spent += (Date.now() - timer.start) / 1000;
+    if (finish) t.done = true;
+    timer = null;
+    closeModal();
+    render();
+  }
+  function extendTimer(){
+    if (!timer) return;
+    var t = task(timer.id);
+    timer.limitMs += S.settings.extend_min * 60000;
+    timer.prompted = false;
+    t.extensions += 1;
+    closeModal();
+    render();
+  }
+  function tick(){
+    var bar = document.getElementById('runbar');
+    if (!timer) { bar.classList.remove('show'); return; }
+    var t = task(timer.id), left = (timer.limitMs - (Date.now() - timer.start)) / 1000;
+    var txt = left >= 0 ? fmt(left) : '+' + fmt(-left);
+    var els = document.querySelectorAll('[data-cd]');
+    for (var i = 0; i < els.length; i++) { els[i].textContent = txt; els[i].classList.toggle('over', left < 0); }
+    document.getElementById('runTitle').textContent = t.title;
+    var rc = document.getElementById('runCd'); rc.textContent = txt;
+    bar.classList.add('show');
+    if (left <= 0 && !timer.prompted) {
+      timer.prompted = true;
+      haptic('warning');
+      openModal('<h3>Время вышло</h3><p>«' + esc(t.title) + '»</p><p style="color:var(--muted)">Ты поставила ' +
+        mins(timer.limitMs/1000) + ' мин. Завершаем или ещё ' + S.settings.extend_min + ' минут?</p>' +
+        '<div class="btns"><button class="btn" data-act="extend">Ещё ' + S.settings.extend_min + ' мин</button>' +
+        '<button class="btn main" data-act="finish">Завершаем</button></div>', true);
+    }
+  }
+  setInterval(tick, 1000);
+
+  /* ---------- модалки ---------- */
+  var modalLocked = false;
+  function openModal(html, locked){ document.getElementById('sheet').innerHTML = html; document.getElementById('overlay').classList.add('show'); modalLocked = !!locked; }
+  function closeModal(){ document.getElementById('overlay').classList.remove('show'); modalLocked = false; }
+
+  function summary(){
+    var st = stats(), th = Math.round(S.settings.balance_threshold*100);
+    var missed = st.all.filter(function(i){ return !i.done; });
+    var html = '<h3>Итоги дня</h3>' +
+      '<p><b>' + Math.round(st.pct*100) + '%</b> отмечено, ' + st.done + ' из ' + st.total + '. ' +
+      (st.counted ? 'День засчитан в серию «Дни в балансе».' : 'До порога ' + th + '% не хватает: ' + st.need + '.') + '</p>';
+
+    html += '<div class="sum-h">Сферы</div>' + S.spheres.map(function(s){
+      return '<div class="sum-row"><span>' + s.icon + ' ' + esc(s.name) + '</span><span>' + Math.round(st.by[s.id]*100) + '%</span></div>';
+    }).join('');
+
+    html += '<div class="sum-h">Время на задачи</div>' + S.tasks.map(function(t){
+      var extra = t.extensions ? ', продлений: ' + t.extensions : '';
+      return '<div class="sum-row"><span>' + esc(t.title) + '</span><span>' + mins(t.spent) + ' мин' + extra + '</span></div>';
+    }).join('');
+
+    var deep = S.tasks.filter(function(t){ return t.extensions > 0; });
+    if (deep.length) html += '<p style="margin-top:10px">Здесь ты выходила за лимит: ' + deep.map(function(t){ return '«' + esc(t.title) + '»'; }).join(', ') + '.</p>';
+
+    if (missed.length) html += '<div class="sum-h">Не отмечено</div>' + missed.map(function(i){
+      return '<div class="sum-row"><span>' + esc(i.title) + '</span><span>' + sphere(i.sphere).icon + '</span></div>';
+    }).join('');
+
+    html += '<div class="coach">🧡 <b>Разбор коуча</b><br>Появится здесь, когда подключим Google Таблицу и твоего агента. Сейчас итоги считает само приложение.</div>' +
+      '<div class="btns"><button class="btn main" data-act="close">Закрыть</button></div>';
+    openModal(html);
+  }
+
+  function weekSchedule(){
+    var days = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+    var order = [1,2,3,4,5,6,0], today = new Date().getDay();
+    var html = '<h3>Внимание по дням</h3>' + order.map(function(d){
+      var names = (S.family.schedule[String(d)] || []).map(function(id){
+        var p = S.family.people.filter(function(x){ return x.id === id; })[0]; return p ? p.name : id;
+      }).join(', ');
+      return '<div class="sum-row"' + (d === today ? ' style="font-weight:600"' : '') + '><span>' + days[d] + '</span><span>' + esc(names || '—') + '</span></div>';
+    }).join('') + '<div class="btns"><button class="btn main" data-act="close">Закрыть</button></div>';
+    openModal(html);
+  }
+
+  function addIdea(text){
+    text = (text || '').trim(); if (!text) return;
+    var d = new Date(), iso = d.getFullYear() + '-' + ('0' + (d.getMonth()+1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    S.ideas.push({id:'i' + Date.now(), text:text, date:iso, done:false});
+    haptic('success');
+  }
+
+  /* ---------- события ---------- */
+  document.addEventListener('click', function(e){
+    if (e.target.id === 'overlay' && !modalLocked) { closeModal(); return; }
+    var el = e.target.closest('[data-act]'); if (!el) return;
+    var act = el.getAttribute('data-act'), id = el.getAttribute('data-id');
+    switch (act) {
+      case 'retry': load(); break;
+      case 'demo':
+        S = JSON.parse(JSON.stringify(DEMO)); prepare(); render();
+        document.getElementById('dock').hidden = false; break;
+      case 'habit':
+        S.habits.forEach(function(h){ if (h.id === id) h.done = !h.done; });
+        haptic('success'); render(); break;
+      case 'family':
+        S.family.done[id] = !S.family.done[id]; haptic('success'); render(); break;
+      case 'task':
+        var t = task(id);
+        if (timer && timer.id === id) { stopTimer(!t.done); break; }
+        t.done = !t.done; haptic('success'); render(); break;
+      case 'limit':
+        var tt = task(id), i = LIMITS.indexOf(tt.limit_min);
+        tt.limit_min = LIMITS[(i + 1) % LIMITS.length]; render(); break;
+      case 'start': startTimer(id); break;
+      case 'stop': stopTimer(false); break;
+      case 'finish': stopTimer(true); break;
+      case 'extend': extendTimer(); break;
+      case 'goal': el.classList.toggle('open'); break;
+      case 'tab': S.tab = id; closeModal(); render(); window.scrollTo(0, 0); break;
+      case 'new-idea':
+        openModal('<h3>Новая идея</h3><p style="color:var(--muted)">Запиши и возвращайся к делу. Разберёшь потом в Копилке.</p>' +
+          '<textarea class="field" id="ideaText" placeholder="Что пришло в голову?"></textarea>' +
+          '<div class="btns"><button class="btn" data-act="close">Отмена</button><button class="btn main" data-act="save-idea">Записать</button></div>');
+        setTimeout(function(){ var f = document.getElementById('ideaText'); f && f.focus(); }, 50);
+        break;
+      case 'save-idea': addIdea(document.getElementById('ideaText').value); closeModal(); break;
+      case 'save-idea-inline': addIdea(document.getElementById('ideaInput').value); render(); break;
+      case 'idea':
+        S.ideas.forEach(function(x){ if (x.id === id) x.done = !x.done; }); haptic('success'); render(); break;
+      case 'new-task':
+        openModal('<h3>Новая задача</h3>' +
+          '<input class="field" id="taskText" placeholder="Что сделать" style="width:100%">' +
+          '<p class="group">Сколько минут</p><div class="family" id="taskLimit">' +
+          LIMITS.map(function(m, i){
+            return '<button class="person' + (m === 40 ? ' done' : '') + '" data-act="pick-limit" data-id="' + m + '"><span class="title">' + m + ' мин</span></button>';
+          }).join('') + '</div>' +
+          '<p class="group">Куда отнести</p><div class="family" id="taskCat">' +
+          Object.keys(S.task_categories).map(function(c, i){
+            return '<button class="person' + (i === 0 ? ' done' : '') + '" data-act="pick-cat" data-id="' + esc(c) + '"><span class="title">' + esc(S.task_categories[c]) + '</span></button>';
+          }).join('') + '</div>' +
+          '<div class="btns"><button class="btn" data-act="close">Отмена</button><button class="btn main" data-act="save-task">Добавить</button></div>');
+        setTimeout(function(){ var f = document.getElementById('taskText'); f && f.focus(); }, 50);
+        break;
+      case 'pick-limit':
+        var pl = document.querySelectorAll('#taskLimit .person');
+        for (var q = 0; q < pl.length; q++) pl[q].classList.toggle('done', pl[q] === el);
+        break;
+      case 'pick-cat':
+        var pc = document.querySelectorAll('#taskCat .person');
+        for (var w = 0; w < pc.length; w++) pc[w].classList.toggle('done', pc[w] === el);
+        break;
+      case 'save-task':
+        var tt = document.getElementById('taskText').value.trim();
+        var lm = document.querySelector('#taskLimit .person.done');
+        var ct = document.querySelector('#taskCat .person.done');
+        if (tt) S.tasks.push({
+          id: 't' + Date.now(),
+          category: ct ? ct.getAttribute('data-id') : Object.keys(S.task_categories)[0],
+          sphere: 'work',
+          title: tt,
+          limit_min: lm ? parseInt(lm.getAttribute('data-id'), 10) : 40,
+          spent_min: 0, spent: 0, extensions: 0, done: false
+        });
+        closeModal(); render(); break;
+      case 'new-goal':
+        var hz = S.horizons.filter(function(x){ return x.id === id; })[0];
+        openModal('<h3>Цель ' + esc(hz ? hz.name.toLowerCase() : '') + '</h3>' +
+          '<input class="field" id="goalText" placeholder="Например: 20 уроков курса" style="width:100%">' +
+          '<p class="group">Сфера</p><div class="family" id="goalSphere">' + S.spheres.map(function(s, i){
+            return '<button class="person' + (i === 0 ? ' done' : '') + '" data-act="pick-sphere" data-id="' + s.id + '"><span class="title">' + s.icon + ' ' + esc(s.name) + '</span></button>';
+          }).join('') + '</div>' +
+          '<div class="btns"><button class="btn" data-act="close">Отмена</button><button class="btn main" data-act="save-goal" data-id="' + esc(id) + '">Добавить</button></div>');
+        break;
+      case 'pick-sphere':
+        var ps = document.querySelectorAll('#goalSphere .person');
+        for (var k = 0; k < ps.length; k++) ps[k].classList.toggle('done', ps[k] === el);
+        break;
+      case 'save-goal':
+        var gt = document.getElementById('goalText').value.trim();
+        var sel = document.querySelector('#goalSphere .person.done');
+        if (gt) S.goals.push({id:'g' + Date.now(), horizon:id, sphere: sel ? sel.getAttribute('data-id') : S.spheres[0].id, title:gt, detail:'', progress:0});
+        closeModal(); render(); break;
+      case 'new-item':
+        var key = el.getAttribute('data-key');
+        openModal('<h3>' + (key === 'books' ? 'Новая книга' : 'Новое обучение') + '</h3>' +
+          '<input class="field" id="itemText" placeholder="Название" style="width:100%">' +
+          '<div class="btns"><button class="btn" data-act="close">Отмена</button><button class="btn main" data-act="save-item" data-key="' + key + '">Добавить в «' + STATUS[key].want + '»</button></div>');
+        break;
+      case 'save-item':
+        var k2 = el.getAttribute('data-key'), it = document.getElementById('itemText').value.trim();
+        if (it) S[k2].push({id:k2.charAt(0) + Date.now(), title:it, status:'want'});
+        closeModal(); render(); break;
+      case 'cycle':
+        var k3 = el.getAttribute('data-key');
+        S[k3].forEach(function(x){ if (x.id === id) x.status = ORDER[(ORDER.indexOf(x.status) + 1) % ORDER.length]; });
+        render(); break;
+      case 'week': weekSchedule(); break;
+      case 'summary': summary(); break;
+      case 'close': closeModal(); break;
+    }
+  });
+
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') persist(); });
+  window.addEventListener('pagehide', persist);
+
+  load();
+})();
+</script>
+</body>
+</html>
