@@ -437,7 +437,7 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
   }
 
   function renderGoals(){
-    var html = (S._demo ? '<p class="demo-note">Тестовые данные: отметки не сохраняются</p>' : '') +
+    var html = (S._noStore ? '<p class="demo-note">Отметки не сохраняются: открой приложение через Telegram</p>' : '') +
       '<h1 class="page-title">Мои цели</h1><p class="lead">От месяца до пяти лет. Нажми на цель, чтобы увидеть детали.</p>';
     S.horizons.forEach(function(hz){
       var list = S.goals.filter(function(g){ return g.horizon === hz.id; });
@@ -445,6 +445,7 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
         list.map(goalRow).join('') +
         '<button class="add" data-act="new-goal" data-id="' + hz.id + '">+ Добавить цель</button></div></section>';
     });
+    if (tg) html += '<div class="list"><button class="week" data-act="share" data-id="goals">Отправить цели Нисо</button></div>';
     return html;
   }
 
@@ -472,7 +473,7 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
   }
 
   function renderVault(){
-    var html = (S._demo ? '<p class="demo-note">Тестовые данные: отметки не сохраняются</p>' : '') +
+    var html = (S._noStore ? '<p class="demo-note">Отметки не сохраняются: открой приложение через Telegram</p>' : '') +
       '<h1 class="page-title">Копилка</h1><p class="lead">Идеи, книги и обучение. Записала мысль и вернулась к делу.</p>';
     html += '<section class="block"><h2>💡 Идеи</h2>' +
       '<div class="capture"><input class="field" id="ideaInput" placeholder="Что пришло в голову?" enterkeyhint="done">' +
@@ -484,7 +485,40 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
       }).join('') + '</div><p class="hint">Отметь галочкой, когда внедрила.</p></section>';
     html += renderShelf('books', 'Книги', '📚');
     html += renderShelf('courses', 'Обучение', '🎓');
+    if (tg) html += '<div class="list"><button class="week" data-act="share" data-id="vault">Отправить копилку Нисо</button></div>';
     return html;
+  }
+
+  /* ---------- выгрузка Нисо: открывает чат с ботом, текст уже в поле ввода ---------- */
+  var BOT = 'myassistantapricot_bot';
+  function exportText(kind){
+    var out = [];
+    if (kind === 'goals') {
+      out.push('Цели из «Мой день» на ' + todayISO());
+      S.horizons.forEach(function(hz){
+        var list = S.goals.filter(function(g){ return g.horizon === hz.id; });
+        if (!list.length) return;
+        out.push('', hz.name + ':');
+        list.forEach(function(g){ out.push('• ' + sphere(g.sphere).icon + ' ' + g.title + (g.detail ? ' — ' + g.detail : '') + (g.progress ? ' (' + g.progress + '%)' : '')); });
+      });
+      if (out.length === 1) out.push('пока пусто');
+    } else {
+      out.push('Копилка из «Мой день» на ' + todayISO());
+      var ideas = S.ideas.filter(function(x){ return !x.done; });
+      if (ideas.length) { out.push('', 'Идеи:'); ideas.forEach(function(x){ out.push('• ' + x.text + ' (' + x.date + ')'); }); }
+      ['books','courses'].forEach(function(k){
+        if (!S[k].length) return;
+        out.push('', k === 'books' ? 'Книги:' : 'Обучение:');
+        S[k].forEach(function(x){ out.push('• ' + x.title + ' — ' + STATUS[k][x.status]); });
+      });
+      if (out.length === 1) out.push('пока пусто');
+    }
+    return out.join('\n');
+  }
+  function shareToBot(kind){
+    var text = exportText(kind);
+    if (text.length > 3900) text = text.slice(0, 3890) + '…';
+    try { tg.openTelegramLink('https://t.me/' + BOT + '?text=' + encodeURIComponent(text)); } catch(e){}
   }
 
   function fmtDate(s){
@@ -710,6 +744,7 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
         S[k3].forEach(function(x){ if (x.id === id) x.status = ORDER[(ORDER.indexOf(x.status) + 1) % ORDER.length]; });
         render(); break;
       case 'week': weekSchedule(); break;
+      case 'share': shareToBot(id); break;
       case 'summary': summary(); break;
       case 'close': closeModal(); break;
     }
