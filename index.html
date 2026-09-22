@@ -179,6 +179,90 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
     } catch (e) {}
   }
 
+
+  /* ---------- хранилище: Telegram CloudStorage + localStorage ---------- */
+  var LS_KEY = 'mdb_state_v1', CHUNK = 3800;
+  var cloud = (function(){
+    try { return tg && tg.CloudStorage && tg.isVersionAtLeast && tg.isVersionAtLeast('6.9') ? tg.CloudStorage : null; } catch(e){ return null; }
+  })();
+  var storageOk = !!cloud || (function(){ try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; } catch(e){ return false; } })();
+
+  function todayISO(){ var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth()+1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+
+  function snapshot(){
+    return {
+      day: S.day || todayISO(),
+      balance_streak: S.balance_streak || 0,
+      habits: S.habits.map(function(h){ return {id:h.id, done:!!h.done, streak:h.streak||0}; }),
+      family_done: S.family.done || {},
+      tasks: S.tasks.map(function(t){ return {id:t.id, category:t.category, sphere:t.sphere, title:t.title, limit_min:t.limit_min,
+        spent_min: Math.round((t.spent||0)/60), extensions:t.extensions||0, done:!!t.done}; }),
+      goals: S.goals, ideas: S.ideas, books: S.books, courses: S.courses
+    };
+  }
+
+  var saveTimer = null;
+  function persist(){
+    if (!S || S._noStore) return;
+    var json = JSON.stringify(snapshot());
+    try { localStorage.setItem(LS_KEY, json); } catch(e){}
+    if (!cloud) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){ cloudWrite(json); }, 300);
+  }
+  function cloudWrite(json){
+    var parts = [];
+    for (var i = 0; i < json.length; i += CHUNK) parts.push(json.slice(i, i + CHUNK));
+    var pending = parts.length + 1;
+    function done(){ if (--pending === 0) cloud.getKeys(function(err, keys){
+      if (err || !keys) return;
+      var stale = keys.filter(function(k){ return /^c\d+$/.test(k) && parseInt(k.slice(1), 10) >= parts.length; });
+      if (stale.length) cloud.removeItems(stale, function(){});
+    }); }
+    parts.forEach(function(chunk, i){ cloud.setItem('c' + i, chunk, done); });
+    cloud.setItem('n', String(parts.length), done);
+  }
+  function cloudRead(cb){
+    if (!cloud) return cb(null);
+    cloud.getItem('n', function(err, n){
+      n = parseInt(n, 10);
+      if (err || !n) return cb(null);
+      var keys = []; for (var i = 0; i < n; i++) keys.push('c' + i);
+      cloud.getItems(keys, function(err2, vals){
+        if (err2 || !vals) return cb(null);
+        var json = keys.map(function(k){ return vals[k] || ''; }).join('');
+        try { cb(JSON.parse(json)); } catch(e){ cb(null); }
+      });
+    });
+  }
+  function localRead(){ try { return JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch(e){ return null; } }
+
+  function applySaved(saved){
+    if (!saved) return;
+    S.day = saved.day; S.balance_streak = saved.balance_streak || 0;
+    (saved.habits || []).forEach(function(sh){ S.habits.forEach(function(h){ if (h.id === sh.id) { h.done = sh.done; h.streak = sh.streak; } }); });
+    S.family.done = saved.family_done || {};
+    if (saved.tasks) { S.tasks = saved.tasks; S.tasks.forEach(function(t){ t.spent = (t.spent_min || 0) * 60; t.extensions = t.extensions || 0; }); }
+    if (saved.goals) S.goals = saved.goals;
+    if (saved.ideas) S.ideas = saved.ideas;
+    if (saved.books) S.books = saved.books;
+    if (saved.courses) S.courses = saved.courses;
+  }
+
+  /* новый день: закрываем вчерашний — серии, сброс галочек */
+  function rollover(){
+    var today = todayISO();
+    if (!S.day) { S.day = today; return; }
+    if (S.day === today) return;
+    var st = stats();
+    S.balance_streak = st.counted ? (S.balance_streak || 0) + 1 : 0;
+    S.habits.forEach(function(h){ h.streak = h.done ? (h.streak||0) + 1 : 0; h.done = false; });
+    S.family.done = {};
+    S.tasks = S.tasks.filter(function(t){ return !t.done; });
+    S.tasks.forEach(function(t){ t.spent = 0; t.spent_min = 0; t.extensions = 0; });
+    S.day = today;
+  }
+
   var S = null;
   var DEMO = {"user": {"id": "demo", "name": "Зебо"}, "settings": {"balance_threshold": 0.9, "default_timer_min": 40, "extend_min": 10}, "balance_streak": 0, "spheres": [{"id": "body", "name": "Тело", "icon": "🧘‍♀️", "color": "#F4A05A"}, {"id": "beauty", "name": "Красота", "icon": "🌸", "color": "#E98C8C"}, {"id": "soul", "name": "Душа", "icon": "🕊️", "color": "#B39AD1"}, {"id": "family", "name": "Семья", "icon": "🤍", "color": "#E9B949"}, {"id": "work", "name": "Работа", "icon": "💼", "color": "#86AE8C"}, {"id": "growth", "name": "Развитие", "icon": "📖", "color": "#7EA6C8"}], "habits": [{"id": "juice", "block": "morning", "sphere": "body", "title": "Утренний сок", "streak": 0, "done": false}, {"id": "med_morning", "block": "morning", "sphere": "soul", "title": "Утренняя медитация", "streak": 0, "done": false}, {"id": "mfr_morning", "block": "morning", "sphere": "body", "title": "МФР / йога", "streak": 0, "done": false}, {"id": "ff_morning", "block": "morning", "sphere": "beauty", "title": "Фейс-фитнес", "streak": 0, "done": false}, {"id": "strength", "block": "day", "sphere": "body", "title": "Силовая тренировка", "streak": 0, "done": false}, {"id": "salad", "block": "evening", "sphere": "body", "title": "Вечерний салат", "streak": 0, "done": false}, {"id": "mfr_evening", "block": "evening", "sphere": "body", "title": "МФР / йога", "streak": 0, "done": false}, {"id": "ff_evening", "block": "evening", "sphere": "beauty", "title": "Фейс-фитнес", "streak": 0, "done": false}, {"id": "med_evening", "block": "evening", "sphere": "soul", "title": "Короткая медитация", "streak": 0, "done": false}], "family": {"people": [{"id": "p1", "name": "Мама", "role": "родители"}, {"id": "p2", "name": "Папа", "role": "родители"}, {"id": "p3", "name": "Свекровь", "role": "семья мужа"}, {"id": "p4", "name": "Старший сын", "role": "сын"}, {"id": "p5", "name": "Дочь", "role": "дочь"}, {"id": "p6", "name": "Младший сын", "role": "сын"}], "schedule": {"1": ["p1"], "2": ["p4"], "3": ["p2"], "4": ["p5"], "5": ["p3"], "6": ["p6"], "0": ["p1", "p2"]}}, "task_categories": {"blog": "Блог", "clients": "Клиенты", "learning": "Обучение"}, "tasks": [], "goals": [], "horizons": [{"id": "month", "name": "На месяц"}, {"id": "6m", "name": "На 6 месяцев"}, {"id": "year", "name": "На год"}, {"id": "5y", "name": "На 5 лет"}], "ideas": [], "books": [], "courses": []};
   var timer = null; // {id, start, limitMs, prompted}
@@ -196,11 +280,10 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
     $app.innerHTML = '<div class="empty"><div class="big">🍑</div><p>Загружаю твой день…</p></div>';
     fetch('data.json?v=' + Date.now(), {cache:'no-store'})
       .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then(function(d){ S = d; prepare(); render(); document.getElementById('dock').hidden = false; })
+      .then(function(d){ S = d; prepare(); restore(); })
       .catch(function(){
         if (DEMO) {
-          S = JSON.parse(JSON.stringify(DEMO)); S._demo = true; prepare(); render();
-          document.getElementById('dock').hidden = false;
+          S = JSON.parse(JSON.stringify(DEMO)); S._demo = true; prepare(); restore();
           return;
         }
         document.getElementById('dock').hidden = true;
@@ -208,6 +291,17 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
           '<p>Приложение не видит файл data.json. Проверь, что он лежит рядом с index.html.</p>' +
           '<button class="cta" data-act="retry">Загрузить снова</button></div>';
       });
+  }
+
+  function restore(){
+    var local = localRead();
+    cloudRead(function(remote){
+      applySaved(remote || local);
+      rollover();
+      S._noStore = !storageOk;
+      render(); persist();
+      document.getElementById('dock').hidden = false;
+    });
   }
 
   function prepare(){
@@ -269,7 +363,7 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
     var date = now.toLocaleDateString('ru-RU', {weekday:'long', day:'numeric', month:'long'});
     var streak = S.balance_streak + (st.counted ? 1 : 0);
 
-    var html = (S._demo ? '<p class="demo-note">Тестовые данные: отметки не сохраняются</p>' : '') + '<div class="top"><div><h1 class="hello">' + greet + ', ' + esc(S.user.name) + '</h1><p class="date">' + esc(date) + '</p></div>' +
+    var html = (S._noStore ? '<p class="demo-note">Отметки не сохраняются: открой приложение через Telegram</p>' : '') + '<div class="top"><div><h1 class="hello">' + greet + ', ' + esc(S.user.name) + '</h1><p class="date">' + esc(date) + '</p></div>' +
       '<button class="idea-btn" data-act="new-idea" aria-label="Записать идею">💡</button></div>';
 
     html += '<section class="hero">' + wheel(st.by) +
@@ -400,6 +494,7 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
 
   function render(){
     S.tab = S.tab || 'today';
+    persist();
     $app.innerHTML = S.tab === 'goals' ? renderGoals() : S.tab === 'vault' ? renderVault() : renderToday();
     document.getElementById('sumBtn').style.display = S.tab === 'today' ? '' : 'none';
     var tabs = document.querySelectorAll('.tab');
@@ -619,6 +714,9 @@ textarea.field{width:100%;min-height:96px;resize:vertical}
       case 'close': closeModal(); break;
     }
   });
+
+  document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden') persist(); });
+  window.addEventListener('pagehide', persist);
 
   load();
 })();
