@@ -1,0 +1,25 @@
+{
+  "name": "abricot-stories",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Переиспользуемая система Instagram Stories 9:16 (1080x1920) для Зебунисо Солиевой и Центра ЗОЖ «Абрикосовый рай»",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "node tools/render-episode.mjs",
+    "transcribe": "python3 tools/transcribe.py"
+  },
+  "dependencies": {
+    "@remotion/captions": "4.0.532",
+    "@remotion/cli": "4.0.532",
+    "@remotion/google-fonts": "4.0.532",
+    "@remotion/media": "4.0.532",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "4.0.532",
+    "zod": "3.22.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "typescript": "^5.5.0"
+  }
+}
