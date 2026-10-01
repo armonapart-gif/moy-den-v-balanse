@@ -1,0 +1,67 @@
+{
+  "id": "series-01",
+  "title": "Почему я решила создать «Пять дней лёгкости»",
+  "transcript": "data/transcripts/full.json",
+  "stories": [
+    {"id": "s01-hook", "title": "Живое начало / hook", "scenes": [
+      {"type": "talkingHead",
+       "cuts": [{"rows": [1], "until": "арбузы!"}, {"rows": [2]}],
+       "highlight": ["арбузы"],
+       "overlays": [{"variant": "headline", "lines": ["Я ПЕРЕДУМАЛА", "ДЕЛАТЬ ВЕБИНАР"], "accent": ["ПЕРЕДУМАЛА"], "at": 0, "dur": 3.6}]}
+    ]},
+    {"id": "s02-chto-izmenilos", "title": "Что изменилось", "scenes": [
+      {"type": "talkingHead",
+       "cuts": [{"rows": [4, 5, 6], "padEnd": 1.0}],
+       "highlight": ["вебинар", "мини-продукт"],
+       "overlays": [{"variant": "headline", "lines": ["ВМЕСТО ВЕБИНАРА", "Я РЕШИЛА СДЕЛАТЬ", "КОЕ-ЧТО ДРУГОЕ"], "accent": ["КОЕ-ЧТО ДРУГОЕ"], "at": {"word": "решила"}}]}
+    ]},
+    {"id": "s03-oflain", "title": "Почему офлайн работает иначе", "scenes": [
+      {"type": "talkingHead",
+       "cuts": [{"rows": [8, 9, 10, 11, 12, 13], "padEnd": 0.6}],
+       "highlight": ["тренера", "занятия", "кафе", "сообщество", "поддержка"],
+       "overlays": [{"variant": "headline", "lines": ["ОФЛАЙН ЖЕНЩИНА", "НЕ ОСТАЁТСЯ ОДНА"], "accent": ["НЕ ОСТАЁТСЯ ОДНА"], "at": {"word": "сообщество"}}]}
+    ]},
+    {"id": "s04-problema-onlaina", "title": "Главная проблема онлайна", "scenes": [
+      {"type": "talkingHead",
+       "cuts": [{"rows": [14, 15, 16, 17, 18, 19, 20, 21], "from": "но", "padEnd": 0.5}],
+       "highlight": ["поддержки", "веры"],
+       "overlays": [
+         {"variant": "card", "lines": ["НЕ ХВАТАЕТ", "ПОДДЕРЖКИ"], "accent": ["ПОДДЕРЖКИ"], "at": {"word": "кому-то", "nth": 1}, "until": {"word": "кому-то", "nth": 2, "edge": "start", "offset": -0.05}},
+         {"variant": "card", "lines": ["НЕ ХВАТАЕТ", "ВЕРЫ В СЕБЯ"], "accent": ["ВЕРЫ В СЕБЯ"], "at": {"word": "кому-то", "nth": 2}, "until": {"word": "кто-то", "nth": 1, "edge": "start", "offset": -0.05}},
+         {"variant": "card", "lines": ["«А ВДРУГ Я ОПЯТЬ", "НЕ СПРАВЛЮСЬ?»"], "accent": ["НЕ СПРАВЛЮСЬ?»"], "editorial": true, "at": {"word": "организовать", "offset": -1.2}, "dur": 4.2}
+       ]}
+    ]},
+    {"id": "s05-opros", "title": "Вовлечение: А вам знакомо?", "scenes": [
+      {"type": "poll", "kicker": "А ВАМ ЗНАКОМО?", "quote": ["Хочу начать заниматься собой,", "но боюсь, что опять брошу"], "accent": ["опять брошу"], "durationSec": 7.0,
+       "note": "Свободное место под настоящий Instagram Poll. Варианты (Да, очень / Нет) добавляются при публикации."}
+    ]},
+    {"id": "s06-rozhdenie-produkta", "title": "Рождение продукта", "scenes": [
+      {"type": "talkingHead", "cuts": [{"rows": [25], "padEnd": 0.5}], "highlight": ["мини-продукт"]},
+      {"type": "text", "variant": "reveal", "lines": ["ПЯТЬ ДНЕЙ", "ЛЁГКОСТИ"], "accent": ["ЛЁГКОСТИ"], "sub": "5 дней рядом со мной", "tags": "ЙОГА • ПИТАНИЕ • ЙОГА ДЛЯ ЛИЦА • ПОДДЕРЖКА", "durationSec": 3.6},
+      {"type": "talkingHead", "cuts": [{"rows": [29, 30, 31], "padEnd": 0.5}], "highlight": ["питанием", "йогой", "информацией", "йогу"]}
+    ]},
+    {"id": "s07-kak-eto-budet", "title": "Как это будет", "scenes": [
+      {"type": "talkingHead",
+       "cuts": [{"rows": [32, 33], "from": "потихоньку", "until": "комфортно", "padEnd": 0.7}],
+       "highlight": ["потихоньку", "шагам"],
+       "accentTail": {"fromWord": "настолько", "nth": 1},
+       "overlays": [{"variant": "stack", "lines": ["НЕ ИДЕАЛЬНО.", "НЕ РЕЗКО.", "ПО ШАГАМ."], "accent": ["ПО ШАГАМ."], "at": 0.3, "until": {"word": "перестраиваете", "offset": 1.2}}]}
+    ]},
+    {"id": "s08-golos-uchastnicy", "title": "Социальное доказательство", "scenes": [
+      {"type": "talkingHead",
+       "cuts": [{"rows": [55, 56, 57, 58], "until": "легче", "padEnd": 0.6}],
+       "overlays": [
+         {"variant": "label", "lines": ["из разговора с участницей программы"], "at": 0},
+         {"variant": "quote", "lines": ["«ПРЕКРАСНО СЕБЯ", "ЧУВСТВУЮ,", "УЖЕ НАМНОГО ЛЕГЧЕ»"], "accent": ["УЖЕ НАМНОГО ЛЕГЧЕ»"], "replaceSubtitles": true, "at": {"word": "говорит"}}
+       ]}
+    ]},
+    {"id": "s09-nazvanie", "title": "Название: reveal", "scenes": [
+      {"type": "talkingHead", "cuts": [{"rows": [60], "until": "мной", "padEnd": 0.5}], "highlight": ["пять", "дней", "лёгкости"]},
+      {"type": "text", "variant": "reveal", "lines": ["ПЯТЬ ДНЕЙ", "ЛЁГКОСТИ"], "accent": ["ЛЁГКОСТИ"], "sub": "5 дней со мной", "durationSec": 4.4}
+    ]},
+    {"id": "s10-vopros", "title": "CTA: исследование аудитории", "scenes": [
+      {"type": "cta", "headline": ["Я СЕЙЧАС СОБИРАЮ", "«ПЯТЬ ДНЕЙ ЛЁГКОСТИ»"], "accent": ["«ПЯТЬ ДНЕЙ ЛЁГКОСТИ»"], "question": "Что вам важнее всего получить за эти 5 дней?", "hint": "лёгкость • питание • йога • энергия • вес • отёчность • другое", "durationSec": 8.0,
+       "note": "Свободное место под Instagram Question Sticker."}
+    ]}
+  ]
+}
