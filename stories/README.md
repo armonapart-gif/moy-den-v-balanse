@@ -42,7 +42,7 @@ stories/
   "title": "Мини-продукт: тест",
   "stories": [
     {"type": "talkingHead", "id": "s01",
-     "clip": {"src": "part1.mov", "from": 0.8, "to": 22, "transcript": "data/transcripts/part1.json"},
+     "clip": {"src": "src1.mov", "from": 0.8, "to": 22, "transcript": "data/transcripts/src1.json"},
      "subtitles": {"highlight": ["вебинар", "мини-продукт"]}},
     {"type": "poll", "id": "s05", "question": "Какое название вам ближе?", "hint": "Место под опрос Instagram оставлено"},
     {"type": "cta", "id": "s06", "headline": "Хотите вебинар?", "action": "Напишите в комментариях", "keyword": "ГОЛОВА"}

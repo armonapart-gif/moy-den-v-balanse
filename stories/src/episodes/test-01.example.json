@@ -2,6 +2,6 @@
   "id": "test-01",
   "title": "Тест: три файла Зебунисо (пример структуры, не монтаж)",
   "stories": [
-    {"type": "talkingHead", "id": "s01", "clip": {"src": "part1.mov", "from": 0, "transcript": "data/transcripts/part1.json"}, "subtitles": {"highlight": []}}
+    {"type": "talkingHead", "id": "s01", "clip": {"src": "src1.mov", "from": 0, "transcript": "data/transcripts/src1.json"}, "subtitles": {"highlight": []}}
   ]
 }
